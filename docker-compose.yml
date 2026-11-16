@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    image: myapp:1.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://postgres:devops@db:5432/postgres
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: devops
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      retries: 10
+volumes:
+  dbdata:
